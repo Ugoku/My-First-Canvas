@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>My First Canvas</title>
+	<style>
+		html, body {
+			margin: 0;
+			overflow: hidden;
+		}
+		canvas {
+			height: 100vh;
+			width: 100%;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas"></canvas>
+	<script>
+		function drawLines()
+		{
+			var xc, xy;
+			// Start a new path
+			context.beginPath();
+
+			// Move to the first point
+			context.moveTo(points[0][0], points[0][1]);
+
+			// Draw a line to each next point
+			for (var i = 1; i < points.length; i++) {
+				context.lineTo(points[i][0], points[i][1]);
+			}
+
+			// Draw a line back to the first point
+			context.closePath();
+		}
+
+		// Math.random() does 0..1, this does 0..max
+		function rand(max)
+		{
+			return Math.round(Math.random() * max);
+		}
+
+		function update()
+		{
+			// Clear the old lines
+			context.clearRect(0, 0, canvas.width, canvas.height);
+
+			// Update coordinates of all the points
+			updatePoints();
+
+			// Set the new color
+			context.strokeStyle = 'hsl(' + (hue++) + ', 100%, 50%)';
+			context.stroke();
+
+			// Draw the new lines
+			drawLines();
+
+			window.requestAnimationFrame(update);
+		}
+
+		function updatePoints()
+		{
+			for (var i = 0; i < points.length; i++) {
+				points[i][0] -= speeds[i][0];
+				points[i][1] -= speeds[i][1];
+
+				// X min
+				if (points[i][0] < 0) {
+					speeds[i][0] *= -1;
+					points[i][0] = 0;
+				}
+				// Y min
+				if (points[i][1] < 0) {
+					speeds[i][1] *= -1;
+					points[i][1] = 0;
+				}
+				// X max
+				if (points[i][0] > canvas.width) {
+					speeds[i][0] *= -1;
+					points[i][0] = canvas.width;
+				}
+				// Y max
+				if (points[i][1] > canvas.height) {
+					speeds[i][1] *= -1;
+					points[i][1] = canvas.height;
+				}
+			}
+		}
+
+
+		// Make a new canvas, full height & width
+		var canvas = document.getElementById('canvas');
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+
+		var context = canvas.getContext('2d');
+		var hue = rand(360);
+
+		canvas.style.backgroundColor = 'hsl(' + rand(360) + ', 100%, 10%)';
+
+		var points = [
+			[rand(canvas.width), rand(canvas.height)],
+			[rand(canvas.width), rand(canvas.height)],
+			[rand(canvas.width), rand(canvas.height)],
+			[rand(canvas.width), rand(canvas.height)]
+		];
+		var speeds = [
+			[rand(16) - 8, rand(10) - 5],
+			[rand(16) - 8, rand(10) - 5],
+			[rand(16) - 8, rand(10) - 5],
+			[rand(16) - 8, rand(10) - 5]
+		];
+
+		drawLines();
+		context.strokeStyle = 'hsl(' + hue + ', 100%, 50%)';
+		context.stroke();
+
+		window.requestAnimationFrame(update);
+	</script>
+</body>
+</html>
